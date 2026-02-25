@@ -28,7 +28,7 @@ final class FeatureExtractor {
         if let f = vision.faces.first {
             cx = Double(f.boundingBox.midX)
             cy = Double(1 - f.boundingBox.midY)
-        } else if let p = vision.poses.first, let torso = try? p.recognizedPoint(.torso) {
+        } else if let p = vision.poses.first, let torso = try? p.recognizedPoint(.root) {
             cx = Double(torso.location.x)
             cy = Double(1 - torso.location.y)
         }

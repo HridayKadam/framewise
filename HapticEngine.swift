@@ -1,6 +1,8 @@
 import Foundation
-import CoreHaptics
 import Combine
+
+#if os(iOS)
+import CoreHaptics
 
 final class HapticEngine {
     private var engine: CHHapticEngine?
@@ -42,3 +44,8 @@ final class HapticEngine {
         }
     }
 }
+#else
+final class HapticEngine {
+    func playScoreFeedback(score: Int, tier: CompositionScore.Tier) {}
+}
+#endif

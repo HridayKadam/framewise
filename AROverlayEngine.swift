@@ -1,8 +1,10 @@
 import Foundation
-import ARKit
-import RealityKit
 import Combine
 import SwiftUI
+
+#if os(iOS)
+import ARKit
+import RealityKit
 
 final class AROverlayEngine: NSObject, ObservableObject {
     @Published var isTrackingLimited: Bool = false
@@ -105,3 +107,13 @@ fileprivate extension MeshResource {
         return combined
     }
 }
+#else
+final class AROverlayEngine: ObservableObject {
+    @Published var isTrackingLimited: Bool = false
+    @Published var overlayOpacity: Double = 0.5
+    func start() {}
+    func stop() {}
+    func updateOpacity(for tier: CompositionScore.Tier) {}
+    func makeARView() -> NSView { NSView() }
+}
+#endif

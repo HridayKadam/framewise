@@ -1,6 +1,8 @@
 import Foundation
-import CoreMotion
 import Combine
+
+#if os(iOS)
+import CoreMotion
 
 final class MotionManager {
     static let shared = MotionManager()
@@ -22,3 +24,13 @@ final class MotionManager {
 
     func stop() { manager.stopDeviceMotionUpdates() }
 }
+#else
+final class MotionManager {
+    static let shared = MotionManager()
+    private let subject = CurrentValueSubject<Double, Never>(0)
+    var horizonAnglePublisher: AnyPublisher<Double, Never> { subject.eraseToAnyPublisher() }
+    private init() {}
+    func start() {}
+    func stop() {}
+}
+#endif

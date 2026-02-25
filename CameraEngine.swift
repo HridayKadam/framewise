@@ -39,18 +39,27 @@ final class CameraEngine: NSObject {
 
     private func configureSession() {
         session.beginConfiguration()
+        #if !os(macOS)
         session.sessionPreset = .high
+        #endif
 
         // Prefer back wide camera.
+        #if os(iOS)
         guard let device = AVCaptureDevice.default(.builtInWideAngleCamera, for: .video, position: .back) else {
             session.commitConfiguration()
             return
         }
+        #else
+        guard let device = AVCaptureDevice.default(for: .video) else {
+            session.commitConfiguration()
+            return
+        }
+        #endif
 
         do {
             try device.lockForConfiguration()
             // Lock to 60 fps as requested for best temporal resolution.
-            if let format = device.activeFormat.videoSupportedFrameRateRanges.first(where: { $0.maxFrameRate >= 60 }) {
+            if device.activeFormat.videoSupportedFrameRateRanges.first(where: { $0.maxFrameRate >= 60 }) != nil {
                 device.activeVideoMinFrameDuration = CMTime(value: 1, timescale: 60)
                 device.activeVideoMaxFrameDuration = CMTime(value: 1, timescale: 60)
             }
@@ -73,7 +82,9 @@ final class CameraEngine: NSObject {
         if session.canAddOutput(videoOutput) { session.addOutput(videoOutput) }
 
         if let connection = videoOutput.connection(with: .video) {
+            #if os(iOS)
             connection.videoOrientation = .portrait
+            #endif
         }
 
         session.commitConfiguration()
